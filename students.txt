@@ -1,0 +1,4 @@
+SV001,Nguyễn Văn A,8.5
+SV002,Trần Thị B,6.8
+SV003,Lê Văn C,4.9
+SV004,Phạm Minh D,9.2
