@@ -7,8 +7,8 @@ import model.Student;
 import java.io.*;
 import java.util.*;
 
-public class FileUntils {
-    private static final String FILE = "students.txt";
+public class FileUtils {
+    private static final String FILE = "students.csv";
 
     public static void save(List<Student> list) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(FILE))) {
@@ -20,7 +20,7 @@ public class FileUntils {
         }
     }
 
-    public static List<Student> load() {
+    public static List<Student> read() {
         List<Student> list = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
             String line;
@@ -32,6 +32,7 @@ public class FileUntils {
         }
         return list;
     }
+
 }
 
 

@@ -18,4 +18,4 @@ Công nghệ sử dụng:
 * Java
 * Scanner
 * ArrayList
-* JDK 1.8
+* JDK 2.5

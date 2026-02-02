@@ -1,6 +1,7 @@
 package ui;
 
 import exception.StudentException;
+import model.Student;
 import service.StudentService;
 
 import java.util.Scanner;
@@ -110,7 +111,7 @@ public class Main {
                         if (backtoMenu) {
                             break;
                         }
-                        sv.add(id, name, score);
+                        sv.add(new Student(id, name, score));
                         break;
 
                     case 2: sv.show(); break;

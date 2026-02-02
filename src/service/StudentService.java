@@ -2,23 +2,19 @@ package service;
 
 import exception.StudentException;
 import model.Student;
-import sun.security.krb5.internal.ccache.FileCredentialsCache;
-import until.FileUntils;
+import until.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class StudentService {
+public class StudentService extends BaseService<Student> {
 
-    private final FileUntils fileUtils = null;
     private List<Student> list = new ArrayList<>();
-
-    public StudentService() {
-        FileUntils FileUtils = fileUtils;
-        list = FileUtils.load();
-        list = FileUtils.load();
+    public  StudentService() {
+        FileUtils FileUtils = new FileUtils();
+        list = FileUtils.read();
         if (list.isEmpty()) {
             list.add(new Student("SV001", "Nguyễn Văn A", 8.5));
             list.add(new Student("SV002", "Trần Thị B", 6.8));
@@ -27,7 +23,6 @@ public class StudentService {
             FileUtils.save(list);
         }
     }
-
 
 
     public boolean isIdExist(String id) {
@@ -59,13 +54,20 @@ public class StudentService {
         FileUtils.save(list);
     }
 
+    @Override
+    public void add(Student student) throws  StudentException {
+        if ( isIdExist(student.getId()))
+            throw new StudentException("ID đã tồn tai");
+        list.add(student);
+        FileUtils.save(list);
+    }
+
     // Hiển thị danh sách
     public void show() {
         if (list.isEmpty()) {
             System.out.println("Danh sách rỗng");
             return;
         }
-
         for (Student s : list) {
             System.out.println(s);
         }
@@ -93,6 +95,8 @@ public class StudentService {
         throw new StudentException("Không tìm thấy sinh viên để xóa");
     }
 
+
+
     // Sửa sinh viên
     public void update(String id, String name, double score) throws StudentException {
         Student s = findById(id);
@@ -100,6 +104,14 @@ public class StudentService {
         s.setScore(score);
         FileUtils.save(list);
     }
+    @Override
+    public void update(String id, Student student) throws StudentException {
+        Student s = findById(id);
+        s.setName(student.getName());
+        s.setScore(student.getScore());
+        FileUtils.save(list);
+    }
+
 
     // Tìm kiếm theo tên
     public boolean search(String keyword) {
@@ -124,6 +136,7 @@ public class StudentService {
         Collections.sort(list, new StudentScoreDescComparator());
         System.out.println("✅ Đã sắp xếp theo điểm giảm dần");
     }
+
     public void showAll() {
         System.out.printf("%-10s %-20s %-5s\n", "ID", "Tên", "Điểm");
         for (Student s : list) {
@@ -149,6 +162,8 @@ public class StudentService {
         double avg = sum / list.size();
         System.out.println("Điểm trung bình: " + avg);
     }
-
-
 }
+
+
+
+
