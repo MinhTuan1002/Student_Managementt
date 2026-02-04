@@ -12,9 +12,11 @@ import java.util.regex.Pattern;
 public class StudentService extends BaseService<Student> {
 
     private List<Student> list = new ArrayList<>();
-    public  StudentService() {
-        FileUtils FileUtils = new FileUtils();
+
+    // ================= CONSTRUCTOR =================
+    public StudentService() {
         list = FileUtils.read();
+
         if (list.isEmpty()) {
             list.add(new Student("SV001", "Nguyễn Văn A", 8.5));
             list.add(new Student("SV002", "Trần Thị B", 6.8));
@@ -24,24 +26,17 @@ public class StudentService extends BaseService<Student> {
         }
     }
 
-
-    public boolean isIdExist(String id) {
-        for (Student s : list) {
-            if (s.getId().equalsIgnoreCase(id)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Thêm sinh viên
+    // ================= ADD =================
     public void add(String id, String name, double score) throws StudentException {
+
         if (!Pattern.matches("SV\\d{3}", id)) {
             throw new StudentException("ID phải đúng dạng SV001");
         }
+
         if (isIdExist(id)) {
             throw new StudentException("ID đã tồn tại");
         }
+
         if (name.length() > 20) {
             throw new StudentException("Tên tối đa 20 ký tự");
         }
@@ -55,90 +50,29 @@ public class StudentService extends BaseService<Student> {
     }
 
     @Override
-    public void add(Student student) throws  StudentException {
-        if ( isIdExist(student.getId()))
-            throw new StudentException("ID đã tồn tai");
+    public void add(Student student) throws StudentException {
+        if (isIdExist(student.getId())) {
+            throw new StudentException("ID đã tồn tại");
+        }
         list.add(student);
         FileUtils.save(list);
     }
 
-    // Hiển thị danh sách
+    // ================= SHOW =================
     public void show() {
         if (list.isEmpty()) {
             System.out.println("Danh sách rỗng");
             return;
         }
+
         for (Student s : list) {
             System.out.println(s);
         }
     }
 
-    // Tìm sinh viên theo ID
-    private Student findById(String id) throws StudentException {
-        for (Student s : list) {
-            if (s.getId().equalsIgnoreCase(id)) {
-                return s;
-            }
-        }
-        throw new StudentException("Không tìm thấy sinh viên");
-    }
-
-    // Xóa sinh viên
-    public void delete(String id) throws StudentException {
-        for (Student s : list) {
-            if (s.getId().equalsIgnoreCase(id)) {
-                list.remove(s);
-                FileUtils.save(list);
-                return;
-            }
-        }
-        throw new StudentException("Không tìm thấy sinh viên để xóa");
-    }
-
-
-
-    // Sửa sinh viên
-    public void update(String id, String name, double score) throws StudentException {
-        Student s = findById(id);
-        s.setName(name);
-        s.setScore(score);
-        FileUtils.save(list);
-    }
-    @Override
-    public void update(String id, Student student) throws StudentException {
-        Student s = findById(id);
-        s.setName(student.getName());
-        s.setScore(student.getScore());
-        FileUtils.save(list);
-    }
-
-
-    // Tìm kiếm theo tên
-    public boolean search(String keyword) {
-        boolean found = false;
-        for (Student s : list) {
-            if (s.getName().toLowerCase().contains(keyword.toLowerCase())) {
-                System.out.println(s);
-                found = true;
-            }
-        }
-        return found;
-    }
-
-    // Sắp xếp theo điểm (tăng dần)
-    public void sortByScoreAsc() {
-        Collections.sort(list, new StudentScoreComparator());
-        System.out.println("✅ Đã sắp xếp theo điểm tăng dần");
-    }
-
-    //Sắp xếp theo điểm (giảm dần)
-    public void sortByScoreDesc() {
-        Collections.sort(list, new StudentScoreDescComparator());
-        System.out.println("✅ Đã sắp xếp theo điểm giảm dần");
-    }
-
     public void showAll() {
         System.out.printf("%-10s %-20s %-5s\n", "ID", "Tên", "Điểm");
+
         for (Student s : list) {
             System.out.printf("%-10s %-20s %-5.1f\n",
                     s.getId(),
@@ -147,7 +81,65 @@ public class StudentService extends BaseService<Student> {
         }
     }
 
-    // Tính điểm trung bình
+    // ================= SEARCH =================
+    public boolean search(String keyword) {
+        boolean found = false;
+
+        for (Student s : list) {
+            if (s.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(s);
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    // ================= DELETE =================
+    public void delete(String id) throws StudentException {
+        for (Student s : list) {
+            if (s.getId().equalsIgnoreCase(id)) {
+                list.remove(s);
+                FileUtils.save(list);
+                return;
+            }
+        }
+
+        throw new StudentException("Không tìm thấy sinh viên để xóa");
+    }
+
+    // ================= UPDATE =================
+    public void update(String id, String name, double score) throws StudentException {
+        Student s = findById(id);
+
+        s.setName(name);
+        s.setScore(score);
+
+        FileUtils.save(list);
+    }
+
+    @Override
+    public void update(String id, Student student) throws StudentException {
+        Student s = findById(id);
+
+        s.setName(student.getName());
+        s.setScore(student.getScore());
+
+        FileUtils.save(list);
+    }
+
+    // ================= SORT =================
+    public void sortByScoreAsc() {
+        Collections.sort(list, new StudentScoreComparator());
+        System.out.println("Đã sắp xếp theo điểm tăng dần");
+    }
+
+    public void sortByScoreDesc() {
+        Collections.sort(list, new StudentScoreDescComparator());
+        System.out.println("Đã sắp xếp theo điểm giảm dần");
+    }
+
+    // ================= AVG =================
     public void avgScore() {
         if (list.isEmpty()) {
             System.out.println("Chưa có sinh viên");
@@ -155,12 +147,33 @@ public class StudentService extends BaseService<Student> {
         }
 
         double sum = 0;
+
         for (Student s : list) {
             sum += s.getScore();
         }
 
         double avg = sum / list.size();
         System.out.println("Điểm trung bình: " + avg);
+    }
+
+    // ================= PRIVATE =================
+    private Student findById(String id) throws StudentException {
+        for (Student s : list) {
+            if (s.getId().equalsIgnoreCase(id)) {
+                return s;
+            }
+        }
+
+        throw new StudentException("Không tìm thấy sinh viên");
+    }
+
+    public boolean isIdExist(String id) {
+        for (Student s : list) {
+            if (s.getId().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
